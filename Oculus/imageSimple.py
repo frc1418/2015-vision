@@ -2,13 +2,71 @@ from sklearn.cluster import MiniBatchKMeans
 import numpy as np
 import cv2
 
-cam = cv2.VideoCapture(0)
+#Function to filter lists into binary lists to find specific values
+def listFilter(inputList, minValue, maxValue, blankValue, fillValue):
+    outputList = []
+    diff = maxValue-minValue
+    t = 0
+    for x in range(minValue, maxValue+1):
+        outputList.append([])
+        for i in range(0, len(inputList)):
+            if inputList[i] == x:
+                outputList[t].append(fillValue)
+            else:
+                outputList[t].append(blankValue)
+        t += 1
+    return outputList
+
+#Function to covert quantified info back to see able image
+def quantifyList(inputList):
+    outputList = []
+    for i in range(0, len(inputList)):
+        outputList.append(clt.cluster_centers_.astype("uint8")[inputList[i]])
+    return outputList
+
+#Function to reshape input images
+def reshapeList(inputList, h, w, d):
+    outputList = []
+    for i in range(0, len(inputList)):
+        outputList.append(inputList[i].reshape((h, w, d)))
+    return outputList
+
+#Function to cvt lists of images to diffrent colros
+def cvtList(inputList, cvt):
+    outputList = []
+    for i in range(0, len(inputList)):
+        outputList.append(cv2.cvtColor(inputList[i], cvt))
+    return outputList
+
+#Function to thresh a list of images
+'''RETURNS THRESH ONLY'''
+def threshList(inputList, thresh, maxValue, type):
+    outputList = []
+    for i in range(0, len(inputList)):
+        outputList.append(cv2.threshold(inputList[i], thresh, maxValue, type)[1])
+    return outputList
+
+#Function to findcountours of a list of images
+'''RETURNS CONTOURS ONLY'''
+def findContoursList(inputList, mode, method):
+    outputList = []
+    for i in range(0, len(inputList)):
+        outputList.append(cv2.findContours(inputList[i].copy(), mode, method)[1])
+    return outputList
+
+#Function to draw a list of contours onto an image
+def drawContoursList(dst, inputList, contourIdx, color, thick):
+    for i in range(0, len(inputList)):
+        cv2.drawContours(dst, inputList[i], contourIdx, color, thickness=thick)
+
+
+camera = cv2.VideoCapture(0)
 while(1):
     #Pulls a frame from the camera
-    image = cam.read()[1]
+    frame = camera.read()[1]
 
     #Resizes image to reduce processsing time
-    image = cv2.resize(image, (250, 100))
+    image = cv2.resize(frame, (250, 100))
 
     #pulls the hieght and width from the image
     (h, w) = image.shape[:2]
@@ -21,34 +79,43 @@ while(1):
 
     # apply k-means using the specified number of clusters and
     # then create the quantized image based on the predictions
-    '''Code I dont fully understand'''
-    clt = MiniBatchKMeans(n_clusters = 5)
+    clt = MiniBatchKMeans(n_clusters = 4)
     labels = clt.fit_predict(image)
-    quant0 = clt.cluster_centers_.astype("uint8")[labels]
+
+    #Filters the labels list into 4 peices of 2 color
+    layers = listFilter(labels,0,3,0,1)
+
+    #Coverts back into image
+    quantifiedLayers = quantifyList(layers)
+    quantifiedImage = clt.cluster_centers_.astype("uint8")[labels]
 
     #Reshapes the output back into a three demisional array
-    quant0 = quant0.reshape((h, w, 3))
+    quantifiedLayers = reshapeList(quantifiedLayers, h, w, 3)
+    quantifiedImage = quantifiedImage.reshape((h, w, 3))
 
     #Converts from LAB to BGR
     #Contverts from BGR to gray-scale for findingcontours
-    quant1 = cv2.cvtColor(quant0, cv2.COLOR_LAB2BGR)
-    imgGray = cv2.cvtColor(quant1, cv2.COLOR_BGR2GRAY)
+    quantifiedLayers = cvtList(quantifiedLayers, cv2.COLOR_LAB2BGR)
+    quantifiedImage = cv2.cvtColor(quantifiedImage, cv2.COLOR_LAB2BGR)
+
+    #Convert Layers to Gray
+    grayLayers = cvtList(quantifiedLayers, cv2.COLOR_BGR2GRAY)
+
+    #Convert the layers to binary
+    threshLayers = threshList(grayLayers, 100, 255, cv2.THRESH_BINARY)
 
     #Finds the contours of the output
-    img, contours, hierarchy = cv2.findContours(imgGray, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
-    print contours
+    layerContours = findContoursList(threshLayers, cv2.RETR_TREE, cv2.CHAIN_APPROX_NONE)
+    #print contours
 
     #Draws all contours onto the quant
-    cv2.drawContours(quant1, contours, -1, (0,0,255), thickness=2)
+    drawContoursList(quantifiedImage, layerContours, -1, (0,0,255), 1)
 
     #Resizes the quantified image so that it is easy to see
-    quant2 = cv2.resize(quant1, (1150,600))
+    newImage = cv2.resize(quantifiedImage, (1150,600))
 
     #Shows the final product
-    cv2.imshow("Find Contours O Image", img)
-    cv2.imshow("imageG", imgGray)
-    cv2.imshow("LAB", quant0)
-    cv2.imshow("image", quant2)
+    cv2.imshow("image", newImage)
 
     #Wait for 1 ms if esc pressed break main while loop
     key = cv2.waitKey(1)
