@@ -7,13 +7,12 @@ def listFilter(inputList, minValue, maxValue, blankValue, fillValue):
     outputList = []
     diff = maxValue-minValue
     t = 0
-    for x in range(minValue, maxValue+1):
+    for i in range(minValue, maxValue+1):
         outputList.append([])
-        for i in range(0, len(inputList)):
-            if inputList[i] == x:
-                outputList[t].append(fillValue)
-            else:
-                outputList[t].append(blankValue)
+        current = inputList.copy()
+        current[current != i] = 0
+        current[current == i] = 1
+        outputList[t].append(current)
         t += 1
     return outputList
 
