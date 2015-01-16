@@ -62,8 +62,6 @@ def drawContoursList(dst, inputList, contourIdx, color, thick):
     for i in range(0, len(inputList)):
         cv2.drawContours(dst, inputList[i], contourIdx, color, thickness=thick)
 
-debugMode = False
-
 camera = cv2.VideoCapture(0)
 
 while(1):
@@ -111,7 +109,7 @@ while(1):
     threshLayers = threshList(grayLayers, 100, 255, cv2.THRESH_BINARY)
 
     #Finds the contours of the output
-    layerContours = findContoursList(threshLayers, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
+    layerContours = findContoursList(threshLayers, cv2.RETR_TREE, cv2.CHAIN_APPROX_NONE)
 
     #Draws all contours onto the quant
     drawContoursList(quantifiedImage, layerContours, -1, (0,0,255), 1)
@@ -130,8 +128,6 @@ while(1):
     key = cv2.waitKey(1)
     if key == 27:
         break
-    elif key == 'd':
-        debugMode = not debugMode
 
 
 #Destroys the "Image" window
