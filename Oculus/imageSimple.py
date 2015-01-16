@@ -7,13 +7,12 @@ def listFilter(inputList, minValue, maxValue, blankValue, fillValue):
     outputList = []
     diff = maxValue-minValue
     t = 0
-    for x in range(minValue, maxValue+1):
+    for i in range(minValue, maxValue+1):
         outputList.append([])
-        for i in range(0, len(inputList)):
-            if inputList[i] == x:
-                outputList[t].append(fillValue)
-            else:
-                outputList[t].append(blankValue)
+        current = inputList.copy()
+        current[current != i] = 0
+        current[current == i] = 1
+        outputList[t].append(current)
         t += 1
     return outputList
 
@@ -64,9 +63,10 @@ camera = cv2.VideoCapture(0)
 while(1):
     #Pulls a frame from the camera
     frame = camera.read()[1]
+    void = camera.read()[1]
 
     #Resizes image to reduce processsing time
-    image = cv2.resize(frame, (250, 100))
+    image = cv2.resize(frame, (200, 50))
 
     #pulls the hieght and width from the image
     (h, w) = image.shape[:2]
