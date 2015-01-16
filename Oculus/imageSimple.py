@@ -10,8 +10,12 @@ def listFilter(inputList, minValue, maxValue, blankValue, fillValue):
     for i in range(minValue, maxValue+1):
         outputList.append([])
         current = inputList.copy()
-        current[current != i] = 0
-        current[current == i] = 1
+        if(i != 0):
+            current[current != i] = 0
+            current[current == i] = 1
+        else:
+            current[current != i] = 1
+            current[current == i] = 0
         outputList[t].append(current)
         t += 1
     return outputList
@@ -58,9 +62,12 @@ def drawContoursList(dst, inputList, contourIdx, color, thick):
     for i in range(0, len(inputList)):
         cv2.drawContours(dst, inputList[i], contourIdx, color, thickness=thick)
 
+debugMode = False
 
 camera = cv2.VideoCapture(0)
+
 while(1):
+
     #Pulls a frame from the camera
     frame = camera.read()[1]
 
@@ -104,8 +111,7 @@ while(1):
     threshLayers = threshList(grayLayers, 100, 255, cv2.THRESH_BINARY)
 
     #Finds the contours of the output
-    layerContours = findContoursList(threshLayers, cv2.RETR_TREE, cv2.CHAIN_APPROX_NONE)
-    #print contours
+    layerContours = findContoursList(threshLayers, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
 
     #Draws all contours onto the quant
     drawContoursList(quantifiedImage, layerContours, -1, (0,0,255), 1)
@@ -116,10 +122,17 @@ while(1):
     #Shows the final product
     cv2.imshow("image", newImage)
 
+    for i in range(0,len(threshLayers)):
+        cv2.imshow("Thresh %s" % i, quantifiedLayers[i])
+        cv2.moveWindow("Thresh %s" % i, (i*250), 0)
+
     #Wait for 1 ms if esc pressed break main while loop
     key = cv2.waitKey(1)
     if key == 27:
         break
+    elif key == 'd':
+        debugMode = not debugMode
+
 
 #Destroys the "Image" window
 cv2.destroyWindow("image")
