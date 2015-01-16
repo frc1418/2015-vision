@@ -63,10 +63,9 @@ camera = cv2.VideoCapture(0)
 while(1):
     #Pulls a frame from the camera
     frame = camera.read()[1]
-    void = camera.read()[1]
 
     #Resizes image to reduce processsing time
-    image = cv2.resize(frame, (200, 50))
+    image = cv2.resize(frame, (250, 100))
 
     #pulls the hieght and width from the image
     (h, w) = image.shape[:2]
