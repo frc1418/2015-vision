@@ -1,6 +1,7 @@
 from sklearn.cluster import MiniBatchKMeans
 import numpy as np
 import cv2
+import sys
 
 #Import other classes
 import drawImage as di
@@ -61,13 +62,42 @@ def findContoursList(inputList, mode, method):
         outputList.append(cv2.findContours(inputList[i].copy(), mode, method)[1])
     return outputList
 
+running = True
+
 camera = cv2.VideoCapture(0)
 
 #Creates global variables to fix the flickering bug
 pastContours = None
 blankContours = [[], [], [], []]
 
-while(1):
+helpArgs = []
+
+showContours = False
+helpArgs.append('   -rc    Shows raw contours being found')
+findTape = False
+helpArgs.append('   -tf    Shows tape being found')
+
+
+if len(sys.argv) != 1:
+    for i in range(1, len(sys.argv)):
+        current = sys.argv[i]
+        if current == '-rc':
+            showContours = True
+        elif current == '-tf':
+            findTape = True
+        elif current == '--help':
+            running = False
+            for tip in helpArgs:
+                print tip
+        else:
+            running = False
+            for tip in helpArgs:
+                print tip
+else:
+    showContours = True
+
+
+while(running):
 
     #Pulls a frame from the camera
     frame = camera.read()[1]
@@ -121,8 +151,10 @@ while(1):
     else:
         pastContours = layerContours
 
-    #di.showContourImage(quantifiedImage, layerContours)
-    tcf.findContourTape(quantifiedImage, layerContours)
+    if showContours:
+        di.showContourImage(quantifiedImage, layerContours)
+    if findTape:
+        tcf.findContourTape(quantifiedImage, layerContours)
 
     #Wait for 1 ms if esc pressed break main while loop
     key = cv2.waitKey(1)
