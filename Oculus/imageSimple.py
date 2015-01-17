@@ -2,6 +2,10 @@ from sklearn.cluster import MiniBatchKMeans
 import numpy as np
 import cv2
 
+#Import other classes
+import drawImage as di
+import tapeContourFinder as tcf
+
 #Function to filter lists into binary lists to find specific values
 def listFilter(inputList, minValue, maxValue, blankValue, fillValue):
     outputList = []
@@ -56,11 +60,6 @@ def findContoursList(inputList, mode, method):
     for i in range(0, len(inputList)):
         outputList.append(cv2.findContours(inputList[i].copy(), mode, method)[1])
     return outputList
-
-#Function to draw a list of contours onto an image
-def drawContoursList(dst, inputList, contourIdx, color, thick):
-    for i in range(0, len(inputList)):
-        cv2.drawContours(dst, inputList[i], contourIdx, color, thickness=thick)
 
 camera = cv2.VideoCapture(0)
 
@@ -122,20 +121,8 @@ while(1):
     else:
         pastContours = layerContours
 
-    #Draws all contours onto the quant
-    drawContoursList(quantifiedImage, layerContours, -1, (0,0,255), 1)
-
-    #Resizes the quantified image so that it is easy to see
-    newImage = cv2.resize(quantifiedImage, (1150,600))
-
-    #Shows the final product
-    cv2.imshow("image", newImage)
-
-    for i in range(0,len(threshLayers)):
-        cv2.imshow("Thresh %s" % i, quantifiedLayers[i])
-        cv2.moveWindow("Thresh %s" % i, (i*250), 0)
-    cv2.imshow("Meh", image)
-    cv2.moveWindow("Meh", 1000, 0)
+    #di.showContourImage(quantifiedImage, layerContours)
+    tcf.findContourTape(quantifiedImage, layerContours)
 
     #Wait for 1 ms if esc pressed break main while loop
     key = cv2.waitKey(1)
