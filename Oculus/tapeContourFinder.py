@@ -13,9 +13,8 @@ def approxListPolyDP(contours, epsilon, closed):
 
 def filterApproxList(inputList):
     outputList = []
-    #print len(inputList)
     for i in range(0, len(inputList)):
-        if len(inputList[i]) == 6:
+        if len(inputList[i]) >= 7:
             outputList.append(inputList[i])
     return outputList
 
@@ -30,4 +29,4 @@ def findContourTape(Image, contours):
     newImage = cv2.resize(Image, (1150,600))
 
     #Shows the final product
-    cv2.imshow("image", newImage)
+    cv2.imshow("Tape", newImage)

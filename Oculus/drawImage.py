@@ -13,4 +13,4 @@ def showContourImage(Image, ContoursList):
     newImage = cv2.resize(Image, (1150,600))
 
     #Shows the final product
-    cv2.imshow("image", newImage)
+    cv2.imshow("Contours", newImage)

@@ -26,7 +26,7 @@ def listFilter(inputList, minValue, maxValue, blankValue, fillValue):
     return outputList
 
 #Function to covert quantified info back to see able image
-def quantifyList(inputList):
+def quantifyList(inputList, clt):
     outputList = []
     for i in range(0, len(inputList)):
         outputList.append(clt.cluster_centers_.astype("uint8")[inputList[i]])
@@ -62,105 +62,79 @@ def findContoursList(inputList, mode, method):
         outputList.append(cv2.findContours(inputList[i].copy(), mode, method)[1])
     return outputList
 
-running = True
+def run(content, showContours, findTape, waitTime, imageInput, running):
 
-camera = cv2.VideoCapture(0)
+    #Creates global variables to fix the flickering bug
+    pastContours = None
+    blankContours = [[], [], [], []]
 
-#Creates global variables to fix the flickering bug
-pastContours = None
-blankContours = [[], [], [], []]
+    while(running):
 
-helpArgs = []
-
-showContours = False
-helpArgs.append('   -rc    Shows raw contours being found')
-findTape = False
-helpArgs.append('   -tf    Shows tape being found')
-
-
-if len(sys.argv) != 1:
-    for i in range(1, len(sys.argv)):
-        current = sys.argv[i]
-        if current == '-rc':
-            showContours = True
-        elif current == '-tf':
-            findTape = True
-        elif current == '--help':
-            running = False
-            for tip in helpArgs:
-                print tip
+        if imageInput:
+            frame = content
         else:
-            running = False
-            for tip in helpArgs:
-                print tip
-else:
-    showContours = True
+            #Pulls a frame from the camera
+            frame = content.read()[1]
+
+        #Resizes image to reduce processsing time
+        image = cv2.resize(frame, (250, 100))
+
+        #pulls the hieght and width from the image
+        (h, w) = image.shape[:2]
+
+        #Changes color to LAB
+        image = cv2.cvtColor(image, cv2.COLOR_BGR2LAB)
+
+        #Reshapes into a two deminsional array
+        image2D = image.reshape((image.shape[0] * image.shape[1], 3))
+
+        # apply k-means using the specified number of clusters and
+        # then create the quantized image based on the predictions
+        clt = MiniBatchKMeans(n_clusters = 4)
+        labels = clt.fit_predict(image2D)
+
+        #Filters the labels list into 4 peices of 2 color
+        layers = listFilter(labels,0,3,0,1)
+
+        #Coverts back into image
+        quantifiedLayers = quantifyList(layers, clt)
+        quantifiedImage = clt.cluster_centers_.astype("uint8")[labels]
+
+        #Reshapes the output back into a three demisional array
+        quantifiedLayers = reshapeList(quantifiedLayers, h, w, 3)
+        quantifiedImage = quantifiedImage.reshape((h, w, 3))
+
+        #Converts from LAB to BGR
+        #Contverts from BGR to gray-scale for findingcontours
+        quantifiedLayers = cvtList(quantifiedLayers, cv2.COLOR_LAB2BGR)
+        quantifiedImage = cv2.cvtColor(quantifiedImage, cv2.COLOR_LAB2BGR)
+
+        #Convert Layers to Gray
+        grayLayers = cvtList(quantifiedLayers, cv2.COLOR_BGR2GRAY)
+
+        #Convert the layers to binary
+        threshLayers = threshList(grayLayers, 100, 255, cv2.THRESH_BINARY)
+
+        #Finds the contours of the output
+        layerContours = findContoursList(threshLayers, cv2.RETR_TREE, cv2.CHAIN_APPROX_NONE)
+
+        #Tests if no contours then draws the last contours
+        if layerContours == blankContours:
+            if pastContours != None:
+                layerContours = pastContours
+        else:
+            pastContours = layerContours
+
+        if showContours:
+            di.showContourImage(quantifiedImage, layerContours)
+        if findTape:
+            tcf.findContourTape(quantifiedImage, layerContours)
+
+        #Wait for 1 ms if esc pressed break main while loop
+        key = cv2.waitKey(waitTime)
+        if key == 27:
+            break
 
 
-while(running):
-
-    #Pulls a frame from the camera
-    frame = camera.read()[1]
-
-    #Resizes image to reduce processsing time
-    image = cv2.resize(frame, (250, 100))
-
-    #pulls the hieght and width from the image
-    (h, w) = image.shape[:2]
-
-    #Changes color to LAB
-    image = cv2.cvtColor(image, cv2.COLOR_BGR2LAB)
-
-    #Reshapes into a two deminsional array
-    image2D = image.reshape((image.shape[0] * image.shape[1], 3))
-
-    # apply k-means using the specified number of clusters and
-    # then create the quantized image based on the predictions
-    clt = MiniBatchKMeans(n_clusters = 4)
-    labels = clt.fit_predict(image2D)
-
-    #Filters the labels list into 4 peices of 2 color
-    layers = listFilter(labels,0,3,0,1)
-
-    #Coverts back into image
-    quantifiedLayers = quantifyList(layers)
-    quantifiedImage = clt.cluster_centers_.astype("uint8")[labels]
-
-    #Reshapes the output back into a three demisional array
-    quantifiedLayers = reshapeList(quantifiedLayers, h, w, 3)
-    quantifiedImage = quantifiedImage.reshape((h, w, 3))
-
-    #Converts from LAB to BGR
-    #Contverts from BGR to gray-scale for findingcontours
-    quantifiedLayers = cvtList(quantifiedLayers, cv2.COLOR_LAB2BGR)
-    quantifiedImage = cv2.cvtColor(quantifiedImage, cv2.COLOR_LAB2BGR)
-
-    #Convert Layers to Gray
-    grayLayers = cvtList(quantifiedLayers, cv2.COLOR_BGR2GRAY)
-
-    #Convert the layers to binary
-    threshLayers = threshList(grayLayers, 100, 255, cv2.THRESH_BINARY)
-
-    #Finds the contours of the output
-    layerContours = findContoursList(threshLayers, cv2.RETR_TREE, cv2.CHAIN_APPROX_NONE)
-
-    #Tests if no contours then draws the last contours
-    if layerContours == blankContours:
-        if pastContours != None:
-            layerContours = pastContours
-    else:
-        pastContours = layerContours
-
-    if showContours:
-        di.showContourImage(quantifiedImage, layerContours)
-    if findTape:
-        tcf.findContourTape(quantifiedImage, layerContours)
-
-    #Wait for 1 ms if esc pressed break main while loop
-    key = cv2.waitKey(1)
-    if key == 27:
-        break
-
-
-#Destroys the "Image" window
-cv2.destroyWindow("image")
+    #Destroys the "Image" window
+    cv2.destroyWindow("image")
