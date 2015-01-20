@@ -76,6 +76,9 @@ def run(content, showContours, findTape, waitTime, imageInput, running):
             #Pulls a frame from the camera
             frame = content.read()[1]
 
+        #pulls the origonal hieght
+        OriginalSize = frame.shape[:2]
+
         #Resizes image to reduce processsing time
         image = cv2.resize(frame, (250, 100))
 
@@ -126,9 +129,9 @@ def run(content, showContours, findTape, waitTime, imageInput, running):
             pastContours = layerContours
 
         if showContours:
-            di.showContourImage(quantifiedImage, layerContours)
+            di.showContourImage(quantifiedImage, layerContours, OriginalSize)
         if findTape:
-            tcf.findContourTape(quantifiedImage, layerContours)
+            tcf.findContourTape(quantifiedImage, layerContours, OriginalSize)
 
         #Wait for 1 ms if esc pressed break main while loop
         key = cv2.waitKey(waitTime)

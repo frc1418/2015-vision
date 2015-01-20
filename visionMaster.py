@@ -1,8 +1,6 @@
 import cv2
 import sys
 
-import drawImage as di
-import tapeContourFinder as tcf
 import imageSimple as imgSi
 
 helpArgs = []
@@ -18,25 +16,32 @@ running = True
 
 
 if len(sys.argv) != 1:
+    skip = False
     for i in range(1, len(sys.argv)):
-        current = sys.argv[i]
-        if current == '-rc':
-            rawContours = True
-
-        elif current == '-tf':
-            findTape = True
-        elif current == '-img':
-            imageInput = True
-            i += 1
-            imagePath = sys.argv[i]
-        elif current == '--help':
-            running = False
-            for tip in helpArgs:
-                print tip
+        if skip == True:
+            skip = False
         else:
-            running = False
-            for tip in helpArgs:
-                print tip
+            current = sys.argv[i]
+            if current == '-rc':
+                rawContours = True
+
+            elif current == '-tf':
+                findTape = True
+            elif current == '-img':
+                imageInput = True
+                i += 1
+                imagePath = sys.argv[i]
+                skip = True
+                if len(sys.argv) == 3:
+                    rawContours = True
+            elif current == '--help':
+                running = False
+                for tip in helpArgs:
+                    print tip
+            else:
+                running = False
+                for tip in helpArgs:
+                    print tip
 else:
     rawContours = True
 

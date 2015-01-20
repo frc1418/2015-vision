@@ -18,7 +18,7 @@ def filterApproxList(inputList):
             outputList.append(inputList[i])
     return outputList
 
-def findContourTape(Image, contours):
+def findContourTape(Image, contours, OriginalSize):
     polyLayer = approxListPolyDP(contours, 4, False)
 
     filteredPolyLayer = filterApproxList(polyLayer)
@@ -26,7 +26,7 @@ def findContourTape(Image, contours):
     di.drawContoursList(Image, filteredPolyLayer, -1, (0,0,255), 1)
 
     #Resizes the quantified image so that it is easy to see
-    newImage = cv2.resize(Image, (1150,600))
+    newImage = cv2.resize(Image, (OriginalSize[1],OriginalSize[0]))
 
     #Shows the final product
     cv2.imshow("Tape", newImage)
