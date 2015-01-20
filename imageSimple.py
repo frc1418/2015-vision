@@ -69,11 +69,11 @@ def run(content, showContours, findTape, waitTime, imageInput, running):
     blankContours = [[], [], [], []]
 
     while(running):
-
+        #if it is image input leave the frame alone and run
         if imageInput:
             frame = content
+        #If not image input pull one frame from the camera
         else:
-            #Pulls a frame from the camera
             frame = content.read()[1]
 
         #pulls the origonal hieght
