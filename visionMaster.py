@@ -84,4 +84,4 @@ else:
     content = cv2.VideoCapture(0)
     waitTime = 1
 
-imgSi.run(content, rawContours, findTape, colorAverages, waitTime, imageInput, running)
+imgSi.run(content, rawContours, findTape, True, waitTime, imageInput, running)

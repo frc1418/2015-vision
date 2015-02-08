@@ -119,7 +119,7 @@ def run(content, showContours, findTape, showColors, waitTime, imageInput, runni
         #Contverts from BGR to gray-scale for findingcontours
         quantifiedLayers = cvtList(quantifiedLayers, cv2.COLOR_LAB2BGR)
         quantifiedImage = cv2.cvtColor(quantifiedImage, cv2.COLOR_LAB2BGR)
-        cv2.imshow('quant', quantifiedImage)
+
 
         #Convert Layers to Gray
         grayLayers = cvtList(quantifiedLayers, cv2.COLOR_BGR2GRAY)
@@ -136,14 +136,14 @@ def run(content, showContours, findTape, showColors, waitTime, imageInput, runni
                 layerContours = pastContours
         else:
             pastContours = layerContours
-        abimg = cv2.imread('Images/BlackScreen.png')
+        #abimg = cv2.imread('Images/BlackScreen.png')
 
         if len(layerContours) != 0:
             if showColors:
                 contcopy = copy.copy(layerContours)
                 #grayimg = cv2.cvtColor(OriginalImage, cv2.COLOR_BGR2GRAY)
                 colors = ca.findColorAverages(OriginalImage, layerContours)
-                ca.fillContours(abimg, contcopy, colors)
+                ca.fillContours(OriginalImage, contcopy, colors)
 
 
         if showContours:
