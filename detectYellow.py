@@ -60,24 +60,18 @@ while(running):
             for cont in range(0, len(con)):
                 conto = con[cont]
                 xc = conto[0]
+                yc = conto[1]
                 if yc >= midy:
                     bcounter = bcounter + 1
                     if xc >= midx:
                         rs = rs + 1
                     elif xc < midx:
                         ls = ls + 1
-                    yc = conto[1]
                 elif yc < midy:
                     tcounter = tcounter + 1
         #if there are more points on the bottom add the contour to array of contours on the bottom
         if bcounter > tcounter:
             bottomContours.append(contours[contour])
-
-    print rs, 'rs'
-    print ls, 'ls'
-
-
-
 
     #cv2.imshow('contouryb4', oimg)
     #makes contours into polygons
@@ -115,5 +109,5 @@ while(running):
     if cv2.waitKey(1)  & 0xFF == ord('q'):
         break
 
-cam.releas()
+cam.release()
 cv2.destroyAllWindows()
