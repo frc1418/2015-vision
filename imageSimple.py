@@ -136,14 +136,14 @@ def run(content, showContours, findTape, showColors, waitTime, imageInput, runni
                 layerContours = pastContours
         else:
             pastContours = layerContours
-        #abimg = cv2.imread('Images/BlackScreen.png')
+        abimg = cv2.imread('Images/BlackScreen.png')
 
         if len(layerContours) != 0:
             if showColors:
                 contcopy = copy.copy(layerContours)
                 #grayimg = cv2.cvtColor(OriginalImage, cv2.COLOR_BGR2GRAY)
                 colors = ca.findColorAverages(OriginalImage, layerContours)
-                ca.fillContours(OriginalImage, contcopy, colors)
+                ca.fillContours(abimg, contcopy, colors)
 
 
         if showContours:
