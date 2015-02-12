@@ -9,6 +9,8 @@ helpArgs.append('   -rc    Shows raw contours being found')
 helpArgs.append('   -tf    Shows tape being found')
 helpArgs.append('   -img   Image input (Must be followed by path)')
 
+#Color averages
+colorAverages = True
 #Shows raw unfiltered contours
 rawContours = False
 
@@ -64,15 +66,16 @@ if len(sys.argv) != 1:
                     print tip
 #If no args just show video contours
 else:
-    rawContours = True
+    rawContours = False
 
 #Determining content
 waitTime = None
 content = None
 
 #if image input set the content to the path and set wait time to 0
-#Wait time 0 waits till the esc pressed in imageSimple so it doesnt try
+#Wait time 0 waits till the esc pressed in imageSimple so it doesnt tr
 #to take another frame of a one frame picture
+img = cv2.imread('Images/YT_1.png')
 if imageInput:
     content = cv2.imread(imagePath)
     waitTime = 0
@@ -81,4 +84,4 @@ else:
     content = cv2.VideoCapture(0)
     waitTime = 1
 
-imgSi.run(content, rawContours, findTape, waitTime, imageInput, running)
+imgSi.run(content, rawContours, findTape, True, waitTime, imageInput, running)

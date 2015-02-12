@@ -6,6 +6,9 @@ import sys
 #Import other classes
 import drawImage as di
 import tapeContourFinder as tcf
+import colorAverages as ca
+import copy
+
 
 #Function to filter lists into binary lists to find specific values
 def listFilter(inputList, minValue, maxValue, blankValue, fillValue):
@@ -62,7 +65,9 @@ def findContoursList(inputList, mode, method):
         outputList.append(cv2.findContours(inputList[i].copy(), mode, method)[1])
     return outputList
 
-def run(content, showContours, findTape, waitTime, imageInput, running):
+
+
+def run(content, showContours, findTape, showColors, waitTime, imageInput, running):
 
     #Creates global variables to fix the flickering bug
     pastContours = None
@@ -76,6 +81,7 @@ def run(content, showContours, findTape, waitTime, imageInput, running):
         else:
             frame = content.read()[1]
 
+
         #pulls the origonal hieght
         OriginalSize = frame.shape[:2]
 
@@ -84,7 +90,9 @@ def run(content, showContours, findTape, waitTime, imageInput, running):
 
         #pulls the hieght and width from the image
         (h, w) = image.shape[:2]
-
+        #grabs a copy of the original image for color averaging
+        OriginalImage = copy.copy(image)
+        #cv2.imshow("original Image", image)
         #Changes color to LAB
         image = cv2.cvtColor(image, cv2.COLOR_BGR2LAB)
 
@@ -112,6 +120,7 @@ def run(content, showContours, findTape, waitTime, imageInput, running):
         quantifiedLayers = cvtList(quantifiedLayers, cv2.COLOR_LAB2BGR)
         quantifiedImage = cv2.cvtColor(quantifiedImage, cv2.COLOR_LAB2BGR)
 
+
         #Convert Layers to Gray
         grayLayers = cvtList(quantifiedLayers, cv2.COLOR_BGR2GRAY)
 
@@ -127,9 +136,18 @@ def run(content, showContours, findTape, waitTime, imageInput, running):
                 layerContours = pastContours
         else:
             pastContours = layerContours
+        abimg = cv2.imread('Images/BlackScreen.png')
+
+        if len(layerContours) != 0:
+            if showColors:
+                contcopy = copy.copy(layerContours)
+                #grayimg = cv2.cvtColor(OriginalImage, cv2.COLOR_BGR2GRAY)
+                colors = ca.findColorAverages(OriginalImage, layerContours)
+                ca.fillContours(abimg, contcopy, colors)
+
 
         if showContours:
-            di.showContourImage(quantifiedImage, layerContours, OriginalSize)
+            di.showContourImage(abimg, layerContours, OriginalSize)
         if findTape:
             tcf.findContourTape(quantifiedImage, layerContours, OriginalSize)
 
