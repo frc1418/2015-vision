@@ -16,29 +16,32 @@ def threshold_range(im, lo, hi):
 cam = cv2.VideoCapture(0)
 running = True
 while(running):
-
+    #get image from webcam
     frame = cam.read()[1]
     img = frame
     size = img.shape[:2]
 
     #cv2.imshow('img', img)
+    #copy the image for later use
     oimg = img.copy()
     #bgr = cv2.cvtColor(img, cv2.COLOR_YCrCb2BGR)
+    #convert the color to hsv
     hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
-
+    #split into images for each of those variables
     h, s, v = cv2.split(hsv)
 
+    #look for a certain range of each variable
     h = threshold_range(h, 20, 50)
     #cv2.imshow('h', h)
     s = threshold_range(s, 57, 255)
     #cv2.imshow('s', s)
     v = threshold_range(v, 49, 255)
     #cv2.imshow('v', v)
-
+    #combine each of those images
     combined = cv2.bitwise_and(h, cv2.bitwise_and(s,v))
     #cv2.imshow('Combined', combined)
     img2 = combined.copy()
-
+    #find contours
     trash, contours, hierarchy = cv2.findContours(combined, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
     rs = 0
     ls = 0
@@ -89,13 +92,19 @@ while(running):
         ap = cv2.arcLength(p[contour], True)
         if ap > 400:
             pp.append(p[contour])
+    #booleans to send over network tables
+    #boolean for yellow on bottom right
     rb = False
+    #boolean for yellow on bottom left
     lb = False
+    #boolean for any blob at all(Carter you can use that one or both of the others, your choice)
+    isBlob = False
     if len(pp) > 0:
+        isBlob = True
         if rs > ls:
             rb = True
         if ls <= rs:
-            ls = True
+            lb = True
     #print pp
         #print ap
     #x, y, xlen, ylen = cv2.boundingRect(pp)
