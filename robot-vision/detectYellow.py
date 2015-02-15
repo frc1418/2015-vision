@@ -1,5 +1,6 @@
 import cv2
 import numpy as np
+from networktables import NetworkTable
 
 def threshold_range(im, lo, hi):
     unused, t1 = cv2.threshold(im, lo, 255, type=cv2.THRESH_BINARY)
@@ -11,7 +12,11 @@ def threshold_range(im, lo, hi):
         outputList.append(cv2.findContours(inputList[i].copy(), mode, method)[1])
     return outputList'''
 
+NetworkTable.setIPAddress("localhost")
+NetworkTable.setClientMode()
+NetworkTable.initialize()
 
+sd = NetworkTable.getTable("SmartDashboard")
 
 cam = cv2.VideoCapture(0)
 running = True
@@ -109,6 +114,11 @@ while(running):
         #print ap
     #x, y, xlen, ylen = cv2.boundingRect(pp)
     #print p
+
+    sd.putBoolean("yellowDetected", isBlob)
+    sd.putBoolean("rightGrater", rb)
+    sd.putBoolean("leftGrater", lb)
+
     '''if cv2.arcLength(p[contour], True) > 300:
         nContours.append(p[conto    ur])'''
 
