@@ -50,8 +50,8 @@ def detect_black(img):
         leftside = True
     if rightCounter >= leftCounter:
         rightside = True
-    print(leftside, rightside)
+    return leftside, rightside
 
 
-img = cv2.imread("GreenBinPhotos/Bin4.jpg")
-detect_black(img)
+#img = cv2.imread("GreenBinPhotos/Bin4.jpg")
+#detect_black(img)
