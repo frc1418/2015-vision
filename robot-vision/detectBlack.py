@@ -7,7 +7,7 @@ def threshold_range(im, lo, hi):
     unused, t2 = cv2.threshold(im, hi, 255, type=cv2.THRESH_BINARY_INV)
     return cv2.bitwise_and(t1, t2)
 
-def detect_black(img):
+def detect_black(img, width):
     #convert the color to hsv
     hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
     #split into images for each of those variables
@@ -30,7 +30,6 @@ def detect_black(img):
     #get the raw coordinates of the contour and determine which side of the image it is on
     leftCounter = 0
     rightCounter = 0
-    #image size 240X160 pixels halfway 120 pixels
     for contour in range(0, len(contours)):
         c = contours[contour]
         for co in range(0, len(c)):
@@ -38,7 +37,7 @@ def detect_black(img):
             for cont in range(0, len(con)):
                 conto = con[cont]
                 xcoord = conto[0]
-                if xcoord > 120:
+                if xcoord > (width/2):
                     rightCounter = rightCounter + 1
                 elif xcoord <= 120:
                     leftCounter = leftCounter + 1
