@@ -8,15 +8,19 @@ from networktables import NetworkTable
 Global Variables
 '''
 #Camera resultion
-camera_res = (1280 , 720)
+camera_res = (1280 , 720, 3)
 
 #Processing resultion
 
 #Camera buffers and handle 
 camera1 = cv2.VideoCapture(0)
+camera1.set(cv2.CAP_PROP_FRAME_WIDTH, camera_res[0])
+camera1.set(cv2.CAP_PROP_FRAME_HEIGHT, camera_res[1])
 camera1_buffer = numpy.zeros(camera_res)
 
-camera2 = cv2.VideoCapture(0)
+camera2 = cv2.VideoCapture(1)
+camera2.set(cv2.CAP_PROP_FRAME_WIDTH, camera_res[0])
+camera2.set(cv2.CAP_PROP_FRAME_HEIGHT, camera_res[1])
 camera2_buffer = numpy.zeros(camera_res)
 
 #Booleans
@@ -36,13 +40,13 @@ if args.networked:
     NetworkTable.setIPAddress("localhost")
     NetworkTable.setClientMode()
     NetworkTable.initialize()
+    sd = NetworkTable.getTable("SmartDashboard")
 
 '''
 Main while loop
 '''
 while(running):
     if(args.networked):
-        sd = NetworkTable.getTable("SmartDashboard")
         find_bin = sd.getBoolean("findBin", False)
     
     if(capture):
