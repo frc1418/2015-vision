@@ -27,9 +27,10 @@ def detect_black(img, width):
 
     #find contours on the image
     trash, contours, hierarchy = cv2.findContours(combined, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
-    #get the raw coordinates of the contour and determine which side of the image it is on
-    leftCounter = 0
-    rightCounter = 0
+    #get the raw x coordinate of each point in the contour and then take the average
+    #of those points to find the center
+    xCoordTotal = 0
+    xCoordCounter= 0
     for contour in range(0, len(contours)):
         c = contours[contour]
         for co in range(0, len(c)):
@@ -37,20 +38,16 @@ def detect_black(img, width):
             for cont in range(0, len(con)):
                 conto = con[cont]
                 xcoord = conto[0]
-                if xcoord > (width/2):
-                    rightCounter = rightCounter + 1
-                elif xcoord <= 120:
-                    leftCounter = leftCounter + 1
-    #create booleans to tell which side has more detected black on it default false
-    leftside = False
-    rightside = False
+                xCoordTotal = xCoordTotal + xcoord
+                xCoordCounter = xCoordCounter + 1
+    xCoordAverage = xCoordTotal/xCoordCounter
+    #create a value between -1 & 1. -1 being left. 1 being right
+    centerValue = (xCoordAverage-(width/2))/(width/2)
 
-    if leftCounter >= rightCounter:
-        leftside = True
-    if rightCounter >= leftCounter:
-        rightside = True
-    return leftside, rightside
+    return centerValue
 
 
-#img = cv2.imread("GreenBinPhotos/Bin4.jpg")
-#detect_black(img)
+
+
+#img = cv2.imread("GreenBinPhotos/Bin1.jpg")
+#detect_black(img, 240)
