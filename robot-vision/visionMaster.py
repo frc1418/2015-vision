@@ -45,14 +45,19 @@ if args.networked:
 '''
 Main while loop
 '''
-while(running):
-    if(args.networked):
+while running:
+    if args.networked:
         find_bin = sd.getBoolean("findBin", False)
     
-    if(capture):
+    if capture:
         camera1_buffer = camera1.read()[1]
         camera2_buffer = camera2.read()[2]
         
-    if(find_bin):
-        detectBlack.detect_black(camera1_buffer, camera_res[1])
+    if find_bin:
+        bin_position = detectBlack.detect_black(camera1_buffer, camera_res[1])
+        
+        if args.networked:
+            sd.putDouble("binPosition", bin_position)
+        else:
+            print("Bin Position: %s" % bin_position)
     
