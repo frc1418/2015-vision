@@ -1,6 +1,6 @@
 import cv2
 import numpy as np
-
+import networktables
 
 def threshold_range(im, lo, hi):
     unused, t1 = cv2.threshold(im, lo, 255, type=cv2.THRESH_BINARY)
@@ -32,9 +32,14 @@ def detect_black(img, width):
     xCoordTotal = 0
     xCoordCounter= 0
     goodContours = []
+    biggestArea = 0
+    biggestContour = []
     for contour in range(0, len(contours)):
         contourArea = cv2.contourArea(contours[contour])
         if contourArea >= (width*2):
+            if contourArea > biggestArea:
+                biggestArea = contourArea
+                biggestContour = contours[contour]
             c = contours[contour]
             goodContours.append(c)
             for co in range(0, len(c)):
@@ -49,11 +54,17 @@ def detect_black(img, width):
     else:
         xCoordAverage = 1
     #create a value between -1 & 1. -1 being left. 1 being right
-    x, y, w, h = cv2.getBoundingRect(goodContours)
-    rectangle = [(x, y), (x + w, y), (x + w, y + h), (x, y +h)]
+    if len(biggestContour) > 0:
+        x, y, w, h = cv2.boundingRect(biggestContour)
+    else:
+        x, y, w, h = 0, 0, 0, 0
+    rectangle = [x, y, x + w, y, x + w, y + h, x, y +h]
+    coordinates = networktables.NumberArray()
+    for i in range(0, len(rectangle)):
+        coordinates.append(rectangle[i])
     centerValue = (xCoordAverage-(width/2))/(width/2)
     cv2.drawContours(img, goodContours, -1, (0, 0, 255), 3)
-    return centerValue, rectangle
+    return centerValue, coordinates
 
 
 

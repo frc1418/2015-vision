@@ -42,12 +42,14 @@ if args.networked:
     NetworkTable.setClientMode()
     NetworkTable.initialize()
     sd = NetworkTable.getTable("SmartDashboard")
+    sd.putBoolean("findBin", False)
 else:
     find_bin = args.findBin
 
 '''
 Main while loop
 '''
+
 while running:
     if args.networked:
         find_bin = sd.getBoolean("findBin", False)
@@ -57,11 +59,10 @@ while running:
         camera2_buffer = camera2.read()[1]
 
     if find_bin:
-        bin_position, rectangle = detectBlack.detect_black(camera2_buffer, camera_res[1])
-        print(bin_position)
-
+        bin_position, coordinates = detectBlack.detect_black(camera2_buffer, camera_res[0])
         if args.networked:
             sd.putDouble("binPosition", bin_position)
+            sd.putValue("rectanglePoints", coordinates)
         else:
             print("Bin Position: %s" % bin_position)
             #cv2.imshow("Moo", bin_position[1])
