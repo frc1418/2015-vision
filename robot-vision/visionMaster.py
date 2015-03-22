@@ -8,11 +8,11 @@ from networktables import NetworkTable
 Global Variables
 '''
 #Camera resultion
-camera_res = (1280 , 720, 3)
+camera_res = (240 , 160, 3)
 
 #Processing resultion
 
-#Camera buffers and handle 
+#Camera buffers and handle
 camera1 = cv2.VideoCapture(0)
 camera1.set(cv2.CAP_PROP_FRAME_WIDTH, camera_res[0])
 camera1.set(cv2.CAP_PROP_FRAME_HEIGHT, camera_res[1])
@@ -51,17 +51,17 @@ Main while loop
 while running:
     if args.networked:
         find_bin = sd.getBoolean("findBin", False)
-    
+
     if capture:
         camera1_buffer = camera1.read()[1]
         camera2_buffer = camera2.read()[1]
-        
+
     if find_bin:
-        bin_position = detectBlack.detect_black(camera1_buffer, camera_res[1])
-        
+        bin_position, rectangle = detectBlack.detect_black(camera2_buffer, camera_res[1])
+        print(bin_position)
+
         if args.networked:
             sd.putDouble("binPosition", bin_position)
         else:
             print("Bin Position: %s" % bin_position)
             #cv2.imshow("Moo", bin_position[1])
-    

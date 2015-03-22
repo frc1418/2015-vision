@@ -17,13 +17,13 @@ def detect_black(img, width):
     h = threshold_range(h, 0, 256)
     cv2.imshow('h', h)
     '''
-    s = threshold_range(s, 55, 255)
+    s = threshold_range(s, 10, 160)
     #cv2.imshow('s', s)
-    v = threshold_range(v, 0, 20)
+    v = threshold_range(v, 0, 120)
     #cv2.imshow('v', v)
     #combine each of those images
     combined = cv2.bitwise_and(s,v)
-    #cv2.imshow('Combined', combined)
+    #cv2.imshow('combined', combined)
 
     #find contours on the image
     trash, contours, hierarchy = cv2.findContours(combined, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
@@ -31,23 +31,32 @@ def detect_black(img, width):
     #of those points to find the center
     xCoordTotal = 0
     xCoordCounter= 0
+    goodContours = []
     for contour in range(0, len(contours)):
-        c = contours[contour]
-        for co in range(0, len(c)):
-            con = c[co]
-            for cont in range(0, len(con)):
-                conto = con[cont]
-                xcoord = conto[0]
-                xCoordTotal = xCoordTotal + xcoord
-                xCoordCounter = xCoordCounter + 1
-    xCoordAverage = xCoordTotal/xCoordCounter
+        contourArea = cv2.contourArea(contours[contour])
+        if contourArea >= (width*2):
+            c = contours[contour]
+            goodContours.append(c)
+            for co in range(0, len(c)):
+                con = c[co]
+                for cont in range(0, len(con)):
+                    conto = con[cont]
+                    xcoord = conto[0]
+                    xCoordTotal = xCoordTotal + xcoord
+                    xCoordCounter = xCoordCounter + 1
+    if xCoordCounter != 0:
+        xCoordAverage = xCoordTotal/xCoordCounter
+    else:
+        xCoordAverage = 1
     #create a value between -1 & 1. -1 being left. 1 being right
+    x, y, w, h = cv2.getBoundingRect(goodContours)
+    rectangle = [(x, y), (x + w, y), (x + w, y + h), (x, y +h)]
     centerValue = (xCoordAverage-(width/2))/(width/2)
-
-    return centerValue
-
-
+    cv2.drawContours(img, goodContours, -1, (0, 0, 255), 3)
+    return centerValue, rectangle
 
 
-#img = cv2.imread("GreenBinPhotos/Bin1.jpg")
+
+
+#img = cv2.imread("GreenBinPhotos/Bin12.jpg")
 #detect_black(img, 240)
