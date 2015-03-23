@@ -7,7 +7,10 @@ def threshold_range(im, lo, hi):
     unused, t2 = cv2.threshold(im, hi, 255, type=cv2.THRESH_BINARY_INV)
     return cv2.bitwise_and(t1, t2)
 
-def detect_black(img, width):
+def detect_black(img):
+    
+    width = img.shape[0]
+    
     #convert the color to hsv
     hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
     #split into images for each of those variables
