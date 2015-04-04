@@ -2,7 +2,7 @@ FRC1418 2015 Image Processing Code
 ================================
 
 We're really excited to release our image processing code for 2015! Due to
-mechanical restrictions we did not use any image processing during compitition.
+mechanical restrictions we did not use any image processing during competition.
 However we developed some cool features that we as a team are really proud of.
 
 Details
@@ -11,9 +11,11 @@ Details
 How we get images
 ------------
 
-To get images from the roborio we used a mjpg stream compiled by a third party
-for the roborio. This program allowed us to stream over images while staying within 
-the bandwidth limitations of FRC.
+To get images from the roboRIO we used a prorgram called 'mjpg-streamer' that 
+was compiled by a third party for the roboRIO. This program allowed us to stream
+images to the driver station while staying within the bandwidth limitations of
+FRC. We can run our image processing on the roboRIO, reading from that same
+stream.
 	
 What we do with image processing
 -----------------------------
@@ -36,7 +38,7 @@ More on our features:
 Other developed ideas/features
 ----------------------------
 
-We played around with alot of features this year. All of our scrapped code can be
+We played around with a lot of features this year. All of our scrapped code can be
 found in scratchpad/
 
 Authors
