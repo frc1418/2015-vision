@@ -1,5 +1,8 @@
 FRC1418 2015 Image Processing Code
-================================
+==================================
+
+* Code: [Robot](https://github.com/frc1418/2015-robot) | [UI](https://github.com/frc1418/2015-ui) | **Image Processing** | [Oculus Rift](https://github.com/frc1418/2015-oculus)
+* Factsheet: [Google Doc](https://docs.google.com/document/d/1irbUm-Qfxz_Ua2XiB5KzYWG2Ec5Xhr038NqL-k4FveA)
 
 We're really excited to release our image processing code for 2015! Due to
 mechanical restrictions we did not use any image processing during competition.
